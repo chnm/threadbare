@@ -15,3 +15,12 @@ eighteenth and nineteenth centuries. Knitting together material from three colle
 ### License
 
  All code is copyrighted &copy; 2022 Jason Heppler. Code is licensed [CC0 1.0 Universal](https://github.com/chnm/threadbare/blob/main/LICENSE).
+
+## API Response
+
+For checking the values for consuming the API, the following will help: 
+
+```bash
+curl -X GET "https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.exhibitions.getObjects?access_token=$THREADBARE_KEY&query=India%20textiles" \ 
+  -H "Accept: application/json" | jq
+```
