@@ -1,14 +1,10 @@
-// This program crawls the Cooper Hewitt API to identify textile items.
+// This program crawls museum APIs to identify textile items and writes the metadata
+// to a Postgres database. Currently, it does this with a keyword query of "India textiles"
+// in the Cooper Hewitt collection as a proof-of-concept.
 
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,34 +17,23 @@ const (
 	sampleQuery     = "India%20textiles"
 )
 
+var app = &App{}
+
 func main() {
-
-	req, err := http.NewRequest(
-		http.MethodGet,
-		apiBase+
-			apiObjectsPath+
-			"&access_token="+os.Getenv("THREADBARE_KEY")+
-			"&query="+sampleQuery,
-		nil,
-	)
+	err := app.Init()
 	if err != nil {
-		log.Fatalf("error creating HTTP request: %v", err)
+		log.Fatal("Error initializing the application: ", err)
 	}
 
-	req.Header.Add("Accept", "application/json")
+	// A channel to hold items collected from the API
+	items := make(chan CollectionPagination, 1000)
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatalf("error sending HTTP request: %v", err)
-	}
-	response, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatalf("error reading response body: %v", err)
-	}
-	// Check the response
-	log.Println("Response: ", string(response))
+	// Fetch the data from the API
+	FetchData()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	// Iterate over the data and store those results in the database.
+	go ProcessData(items)
+
+	app.Shutdown() // shutdown the application
+	log.Info("Finished the API crawler")
 }
