@@ -24,15 +24,15 @@ func main() {
 	if err != nil {
 		log.Fatal("Error initializing the application: ", err)
 	}
+	defer app.Shutdown()
 
-	// A channel to hold items collected from the API
-	items := make(chan CollectionPagination, 1000)
+	// use fetch.go .Fetch() method to fetch and process data
+	results := CooperItem{}
+	results.Fetch()
 
-	// Fetch the data from the API
-	FetchData()
-
-	// Iterate over the data and store those results in the database.
-	go ProcessData(items)
+	// Use items.go .Save() method to write to the database
+	items := CooperItem{}
+	items.Save()
 
 	app.Shutdown() // shutdown the application
 	log.Info("Finished the API crawler")
