@@ -1,7 +1,7 @@
 package main
 
 // CooperItems describes the collected items from the Cooper Hewitt API.
-type CooperItems struct {
+type CooperItem struct {
 	ID                  string      `json:"id"`
 	TmsID               string      `json:"tms:id"`
 	AccessionNumber     string      `json:"accession_number"`
@@ -52,35 +52,35 @@ type CooperItems struct {
 			Height    int    `json:"height"`
 			IsPrimary string `json:"is_primary"`
 			ImageID   string `json:"image_id"`
-		} `json:"b,omitempty"`
+		} `json:"b"`
 		Z struct {
 			URL       string `json:"url"`
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
 			IsPrimary string `json:"is_primary"`
 			ImageID   string `json:"image_id"`
-		} `json:"z,omitempty"`
+		} `json:"z"`
 		N struct {
 			URL       string `json:"url"`
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
 			IsPrimary string `json:"is_primary"`
 			ImageID   string `json:"image_id"`
-		} `json:"n,omitempty"`
+		} `json:"n"`
 		D struct {
 			URL       string `json:"url"`
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
 			IsPrimary string `json:"is_primary"`
 			ImageID   string `json:"image_id"`
-		} `json:"d,omitempty"`
+		} `json:"d"`
 		Sq struct {
 			URL       string `json:"url"`
 			Width     int    `json:"width"`
 			Height    int    `json:"height"`
 			IsPrimary string `json:"is_primary"`
 			ImageID   string `json:"image_id"`
-		} `json:"sq,omitempty"`
+		} `json:"sq"`
 		O struct {
 			URL       string `json:"url"`
 			Width     int    `json:"width"`
