@@ -25,10 +25,10 @@ CREATE TABLE IF NOT EXISTS conthreads_items (
     api jsonb
 );
 
-CREATE INDEX ON items (date);
+CREATE INDEX ON conthreads_items (date);
 
-CREATE INDEX ON items (timestamp);
+CREATE INDEX ON conthreads_items (timestamp);
 
-CREATE INDEX ON items (api)
+CREATE INDEX ON conthreads_items (api)
 WHERE
     api IS NULL;
