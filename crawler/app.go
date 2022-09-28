@@ -26,8 +26,7 @@ type App struct {
 	Config   *Config
 	Client   *http.Client
 	Limiters struct {
-		Items       ratelimit.Limiter
-		Collections ratelimit.Limiter
+		Items ratelimit.Limiter
 	}
 }
 
@@ -100,12 +99,6 @@ func (app *App) Init() error {
 	// Create limiters
 	il := ratelimit.New(200-20, ratelimit.Per(60*time.Second)) // 200 requests/minute
 	app.Limiters.Items = il
-
-	cl := ratelimit.New(80-20, ratelimit.Per(60*time.Second)) // 80 requests/minute
-	app.Limiters.Collections = cl
-
-	nl := ratelimit.New(20-4, ratelimit.Per(10*time.Second)) // 120 requests/minute
-	app.Limiters.Collections = nl
 
 	return nil
 }
