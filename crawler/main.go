@@ -28,11 +28,17 @@ func main() {
 
 	// use fetch.go .Fetch() method to fetch and process data
 	results := CooperItem{}
-	results.Fetch()
+	err = results.Fetch()
+	if err != nil {
+		log.Fatal("Error fetching data: ", err)
+	}
 
 	// Use items.go .Save() method to write to the database
 	items := CooperItem{}
-	items.Save()
+	err = items.Save()
+	if err != nil {
+		log.Fatal("Error saving data: ", err)
+	}
 
 	app.Shutdown() // shutdown the application
 	log.Info("Finished the API crawler")
