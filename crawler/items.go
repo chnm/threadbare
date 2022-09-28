@@ -11,11 +11,11 @@ func (cr CooperItem) String() string {
 }
 
 func (cr CooperItem) Save() error {
-	log.Info("Writing items to database.")
+	log.Info("Writing items to database...")
 
 	query := `
-	INSERT INTO connthreads.connthreads_items(i d, title, description, url, medium, date, accession_number, department_id, image_url, country, type, items_url, title_raw)
-	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+	INSERT INTO connthreads.connthreads_items(id, title, date, description, type, medium, url, country)
+	VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	ON CONFLICT DO NOTHING;
 	`
 
