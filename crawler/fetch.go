@@ -14,7 +14,6 @@ import (
 // Fetch the data and return the results to the CooperItems struct.
 func (cr CooperItem) Fetch() error {
 	log.Info("Fetching items from the API.")
-	var items CooperItem
 	var err error
 	var resp *http.Response
 	var body io.Reader
@@ -64,13 +63,48 @@ func (cr CooperItem) Fetch() error {
 	// Parse the data.
 	log.Info("Unmarshalling the data...")
 
-	// var items CooperItem
-	err = json.Unmarshal(responseBody, &items)
+	err = json.Unmarshal(responseBody, &cr)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"url":           url,
 			"parsing_error": err,
 		}).Error("Error parsing JSON")
+	}
+
+	// Check that there is data to write.
+	if len(cr.Objects) == 0 {
+		log.Warn("No items to save.")
+		return nil
+	}
+
+	api, err := json.Marshal(cr)
+	if err != nil {
+		log.Error("Error marshalling API: ", err)
+	}
+
+	// Create a timestamp for the items.
+	timestamp := "NOW()"
+
+	// Write the data to the database
+	for _, item := range cr.Objects {
+		_, err := app.DB.Exec(
+			`INSERT INTO connthreads.connthreads_items (id, title, date, description, type, medium, url, country, timestamp, api)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			ON CONFLICT (id) DO NOTHING`,
+			item.ID,
+			item.Title,
+			item.Date,
+			item.Description,
+			item.Type,
+			item.Medium,
+			item.URL,
+			item.Country,
+			timestamp,
+			api,
+		)
+		if err != nil {
+			log.Error("Error writing item to database: ", err)
+		}
 	}
 
 	return nil

@@ -26,18 +26,11 @@ func main() {
 	}
 	defer app.Shutdown()
 
-	// use fetch.go .Fetch() method to fetch and process data
+	// use fetch.go .Fetch() method to fetch, process, and write data
 	results := CooperItem{}
 	err = results.Fetch()
 	if err != nil {
 		log.Fatal("Error fetching data: ", err)
-	}
-
-	// Use items.go .Save() method to write to the database
-	items := CooperItem{}
-	err = items.Save()
-	if err != nil {
-		log.Fatal("Error saving data: ", err)
 	}
 
 	app.Shutdown() // shutdown the application
