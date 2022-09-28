@@ -11,28 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type ItemResults struct {
-	Objects []struct {
-		ID          string `json:"id"`
-		Title       string `json:"title"`
-		Date        string `json:"date"`
-		Description string `json:"description"`
-		Type        string `json:"type,omitempty"`
-		Medium      string `json:"medium,omitempty"`
-		URL         string `json:"url"`
-	} `json:"objects"`
-}
-
 // Fetch the data and return the results to the CooperItems struct.
 func (cr CooperItem) Fetch() error {
-	// query := `
-	// INSERT INTO conthreads_items(i d, title, description, url, medium, date, accession_number, department_id, image_url, country, type, items_url, title_raw)
-	// VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-	// ON CONFLICT DO NOTHING;
-	// `
-
 	log.Info("Fetching items from the API.")
-	var items ItemResults
+	var items CooperItem
 	var err error
 	var resp *http.Response
 	var body io.Reader
@@ -71,7 +53,6 @@ func (cr CooperItem) Fetch() error {
 			"http_code":  resp.StatusCode,
 			"url":        url,
 		}).Warn("HTTP error when fetching from API")
-		// return
 	}
 
 	defer resp.Body.Close()
