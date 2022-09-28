@@ -7,7 +7,7 @@ import (
 )
 
 func (cr CooperItem) String() string {
-	return cr.Title
+	return cr.Objects[0].Title
 }
 
 func (cr CooperItem) Save() error {
@@ -30,14 +30,14 @@ func (cr CooperItem) Save() error {
 	}
 
 	description := ""
-	if len(cr.Description) > 0 {
-		description = cr.Description
+	if len(cr.Objects[0].Description) > 0 {
+		description = cr.Objects[0].Description
 	}
 
 	// set a timestamp for the item
 	timestamp := "NOW()"
 
-	_, err = stmt.Exec(cr.ID, cr.Title, description, cr.URL, timestamp, cr.Medium, cr.Date, cr.AccessionNumber, cr.DepartmentID, cr.URL, cr.Country, cr.Type, cr.Images, cr.TitleRaw, api)
+	_, err = stmt.Exec(cr.Objects[0].ID, cr.Objects[0].Title, description, cr.Objects[0].URL, timestamp, cr.Objects[0].Medium, cr.Objects[0].Date, cr.Objects[0].AccessionNumber, cr.Objects[0].DepartmentID, cr.Objects[0].URL, cr.Objects[0].Country, cr.Objects[0].Type, cr.Objects[0].Images, cr.Objects[0].TitleRaw, api)
 	if err != nil {
 		return err
 	}
