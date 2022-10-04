@@ -6,19 +6,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/hashicorp/go-retryablehttp"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"go.uber.org/ratelimit"
 )
 
 type Config struct {
-	dbstr    string
-	loglevel string
+	dbstr string
 }
 
 type App struct {
@@ -40,26 +37,6 @@ func (app *App) Init() error {
 		return errors.New("THREADBARE_DB_STR environment variable not set")
 	}
 	app.Config.dbstr = dbstr
-
-	ll, ok := os.LookupEnv("THREADBARE_LOG_LEVEL")
-	if !ok {
-		return errors.New("THREADBARE_LOG_LEVEL environment variable not set")
-	}
-	app.Config.loglevel = ll
-
-	// Set logging level
-	switch app.Config.loglevel {
-	case "error":
-		log.SetLevel(log.ErrorLevel)
-	case "warn":
-		log.SetLevel(log.WarnLevel)
-	case "info":
-		log.SetLevel(log.InfoLevel)
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-	case "trace":
-		log.SetLevel(log.TraceLevel)
-	}
 
 	policy := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 10)
 
@@ -86,19 +63,6 @@ func (app *App) Init() error {
 
 	app.DB = db
 	log.Info("Connected to the database successfully.")
-
-	// Set up client for HTTP requests. Automatically retry.
-	rc := retryablehttp.NewClient()
-	rc.RetryWaitMin = 10 * time.Second
-	rc.RetryWaitMax = 2 * time.Minute
-	rc.RetryMax = 6
-	rc.HTTPClient.Timeout = apiTimeout * time.Second
-	rc.Logger = nil
-	app.Client = rc.StandardClient()
-
-	// Create limiters
-	il := ratelimit.New(200-20, ratelimit.Per(60*time.Second)) // 200 requests/minute
-	app.Limiters.Items = il
 
 	return nil
 }
