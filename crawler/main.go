@@ -30,7 +30,13 @@ func main() {
 	results := CooperItem{}
 	err = results.Fetch()
 	if err != nil {
-		log.Fatal("Error fetching data: ", err)
+		log.Fatal("Error fetching data from Cooper-Hewitt: ", err)
+	}
+
+	varesults := VAItem{}
+	err = varesults.Fetch()
+	if err != nil {
+		log.Fatal("Error fetching data from V&A: ", err)
 	}
 
 	app.Shutdown() // shutdown the application
