@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -29,10 +28,10 @@ func (cr CooperItem) Fetch() error {
 
 	// Build the URL.
 	url, err = url.Parse(
-		apiBase +
-			apiObjectsPath +
+		"https://api.collection.cooperhewitt.org/rest/" +
+			"?method=cooperhewitt.exhibitions.getObjects" +
 			"&access_token=" + os.Getenv("THREADBARE_KEY") +
-			"&query=" + sampleQuery,
+			"&query=" + "India%20textiles",
 	)
 	if err != nil {
 		log.Fatal("Error parsing URL: ", err)
@@ -61,7 +60,7 @@ func (cr CooperItem) Fetch() error {
 	}
 
 	defer resp.Body.Close()
-	responseBody, err = ioutil.ReadAll(resp.Body)
+	responseBody, err = io.ReadAll(resp.Body)
 	if err != nil {
 		log.WithField("url", url).WithError(err).Warn("Error reading HTTP response body")
 	}
@@ -96,20 +95,20 @@ func (cr CooperItem) Fetch() error {
 	// Write the data to the database
 	for _, item := range cr.Objects {
 		_, err := app.DB.Exec(
-			`INSERT INTO connthreads.connthreads_items (id, title, date, description, type, medium, url, country, archive, timestamp, api)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			`INSERT INTO connthreads.connthreads_items (id, title, description, medium, url, date, country, type, timestamp, api, archive)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 			ON CONFLICT (id) DO NOTHING`,
 			item.ID,
 			item.Title,
-			item.Date,
 			item.Description,
-			item.Type,
 			item.Medium,
 			item.URL,
+			item.Date,
 			item.Country,
-			archive,
+			item.Type,
 			timestamp,
 			api,
+			archive,
 		)
 		if err != nil {
 			log.Error("Error writing item to database: ", err)
@@ -158,7 +157,7 @@ func (cr VAItem) Fetch() error {
 	}
 
 	defer resp.Body.Close()
-	responseBody, err = ioutil.ReadAll(resp.Body)
+	responseBody, err = io.ReadAll(resp.Body)
 	if err != nil {
 		log.WithField("url", url).WithError(err).Warn("Error reading HTTP response body")
 	}
@@ -187,23 +186,35 @@ func (cr VAItem) Fetch() error {
 
 	// Create a timestamp for the items.
 	timestamp := "NOW()"
+
 	// Record the archive the items came from.
 	archive := "Victoria and Albert Museum"
 
-	// Write the data to the database
 	for _, item := range cr.Records {
+		// Safely access item.Clusters.ObjectType.Terms[0]
+		var objectType, material, place string
+		if len(item.Clusters.ObjectType.Terms) > 0 {
+			objectType = item.Clusters.ObjectType.Terms[0].Value
+		}
+		if len(item.Clusters.Material.Terms) > 0 {
+			material = item.Clusters.Material.Terms[0].Value
+		}
+		if len(item.Clusters.Place.Terms) > 0 {
+			place = item.Clusters.Place.Terms[0].Value
+		}
+
 		_, err := app.DB.Exec(
-			`INSERT INTO connthreads.connthreads_items (id, title, date, description, type, medium, url, country, archive, timestamp, api)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-			ON CONFLICT (id) DO NOTHING`,
+			`INSERT INTO connthreads.connthreads_items (id, title, date, type, medium, url, country, archive, timestamp, api)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (id) DO NOTHING`,
 			item.SystemNumber,
 			item.PrimaryTitle,
 			item.PrimaryDate,
 			// item.Description,
-			item.Clusters.ObjectType.Terms[0].Value,
-			item.Clusters.Material.Terms[0].Value,
+			objectType,
+			material,
 			item.Images.IiifImageBaseURL,
-			item.Clusters.Place.Terms[0].Value,
+			place,
 			archive,
 			timestamp,
 			api,
