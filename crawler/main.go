@@ -1,6 +1,5 @@
 // This program crawls museum APIs to identify textile items and writes the metadata
-// to a Postgres database. Currently, it does this with a keyword query of "India textiles"
-// in the Cooper Hewitt collection as a proof-of-concept.
+// to a Postgres database.
 
 package main
 
@@ -10,11 +9,8 @@ import (
 
 // Configuration options
 const (
-	apiBase         = "https://api.collection.cooperhewitt.org/rest/"
-	apiObjectsPath  = "?method=cooperhewitt.exhibitions.getObjects"
 	apiItemsPerPage = 1000
 	apiTimeout      = 60 // timeout limit in seconds
-	sampleQuery     = "India%20textiles"
 )
 
 var app = &App{}
