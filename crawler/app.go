@@ -64,6 +64,9 @@ func (app *App) Init() error {
 	app.DB = db
 	log.Info("Connected to the database successfully.")
 
+	// Initialize the HTTP client
+	app.Client = &http.Client{}
+
 	return nil
 }
 
