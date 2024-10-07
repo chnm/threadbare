@@ -1,6 +1,6 @@
 -- Initialize the database -- this is all for testing since
 -- we will be sending the data to Omeka.
-CREATE TABLE IF NOT EXISTS connthreads_collections (
+CREATE TABLE IF NOT EXISTS connthreads.connthreads_collections (
     id text PRIMARY KEY,
     title text,
     description text,
@@ -25,10 +25,10 @@ CREATE TABLE IF NOT EXISTS connthreads.connthreads_items (
     api jsonb
 );
 
-CREATE INDEX ON connthreads_items (date);
+CREATE INDEX ON connthreads.connthreads_items (date);
 
-CREATE INDEX ON connthreads_items (timestamp);
+CREATE INDEX ON connthreads.connthreads_items (timestamp);
 
-CREATE INDEX ON connthreads_items (api)
+CREATE INDEX ON connthreads.connthreads_items (api)
 WHERE
     api IS NULL;
